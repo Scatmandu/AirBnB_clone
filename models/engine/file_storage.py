@@ -38,5 +38,5 @@ class FileStorage:
             json.dump(newDict, fd)
 
     def reload(self):
-
+            pass
 
