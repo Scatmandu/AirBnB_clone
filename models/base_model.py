@@ -3,7 +3,7 @@
 
 import uuid
 from datetime import datetime
-import models import storage
+#import models import storage
 
 class BaseModel():
     ''' Base model for future Classes'''
@@ -21,7 +21,7 @@ class BaseModel():
             self.update_at = datetime.now()
             models.storage.new(self)
 
-    def__str__(self):
+    def __str__(self):
         '''Method to return a string representation'''
 
         return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
