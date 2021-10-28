@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from models.engine.file_storage import FileStorage
-    ''' instan an object filestorage'''
+    #''' instan an object filestorage'''
 
-    storage = FileStorage()
-    storage.reload()
+storage = FileStorage()
+storage.reload()
