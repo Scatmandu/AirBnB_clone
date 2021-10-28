@@ -3,11 +3,11 @@
 Module to serializes instance to Json file and deserializes
 Json file to a instance
 '''
-from models.base_model import BaseModel
 
-
+import models
 import os.path
 import json
+
 
 class FileStorage:
     '''Class to Serializes and deserializes'''
@@ -38,5 +38,14 @@ class FileStorage:
             json.dump(newDict, fd)
 
     def reload(self):
+        '''load objs from json file'''
+
+        try:
+            with open(self.__file_path, 'r') as jsonTOobjs:
+                all_json = json.load(jsonTOobjs)
+                for key in all_json:
+                    self.__objects[key] = getattr(
+                        models, all_json[key]['__class__'])(**all_json[key])
+        except:
             pass
 
