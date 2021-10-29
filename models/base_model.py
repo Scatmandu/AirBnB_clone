@@ -27,7 +27,8 @@ class BaseModel():
     def __str__(self):
         '''Method to return a string representation'''
 
-        return "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(
+            self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
         '''Method to update the attribute update_at
@@ -44,4 +45,3 @@ class BaseModel():
         DictTo["created_at"] = self.created_at.isoformat()
         DictTo["updated_at"] = self.updated_at.isoformat()
         return DictTo
-

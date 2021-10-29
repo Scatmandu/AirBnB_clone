@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 ''' Model defines class Place'''
 
+
 from models.base_model import BaseModel
 
 class Place(BaseModel):
