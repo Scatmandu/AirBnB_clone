@@ -18,7 +18,7 @@ class FileStorage:
     def all(self):
         '''Returns Dict __objects'''
 
-        return __objects
+        return self.__objects
 
     def new(self, obj):
         '''Set __objects with obj as value and obj class name + .id as key
@@ -39,6 +39,7 @@ class FileStorage:
 
     def reload(self):
         '''load objs from json file'''
+
         from models.city import City
         from models.place import Place
         from models.state import State
@@ -58,4 +59,3 @@ class FileStorage:
                 self.__objects[key] = obj
         else:
             return
-
