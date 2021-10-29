@@ -7,7 +7,12 @@ Json file to a instance
 import models
 import os.path
 import json
-
+from models.city import City
+from models.place import Place
+from models.state import State
+from models.review import Review
+from models.amenity import Amenity
+from models.user import User
 
 class FileStorage:
     '''Class to Serializes and deserializes'''
