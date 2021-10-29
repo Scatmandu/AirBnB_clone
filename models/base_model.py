@@ -13,16 +13,14 @@ class BaseModel():
         '''init method of BaseModel'''
         if kwargs:
             for key, value in kwargs.items():
-
                 if key == "created_at" or key == "updated_at":
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                self.__dict__[key] = value
-
+                #self.__dict__[key] = value
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            models.storage.new(self)
+            # models.storage.new(self)
 
     def __str__(self):
         '''Method to return a string representation'''
@@ -33,14 +31,13 @@ class BaseModel():
     def save(self):
         '''Method to update the attribute update_at
         with current date time'''
-
         self.updated_at = datetime.now()
-        models.storage.save()
+        # models.storage.save()
 
     def to_dict(self):
         '''Method to return a dictionary representation of our object'''
 
-        DictTo = dict(self.__dict__)
+        DictTo = self.__dict__.copy()
         DictTo["__class__"] = self.__class__.__name__
         DictTo["created_at"] = self.created_at.isoformat()
         DictTo["updated_at"] = self.updated_at.isoformat()
