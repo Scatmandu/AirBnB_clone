@@ -1,82 +1,66 @@
-#!/usr/bin/python3
-""" FileStorage class test module """
+#!/usr/bin/pyhton3
+"""Unittests for class FileStorage"""
 
-import os
-import pep8
+import inspect
 import unittest
-from models import base_model
+from datetime import datetime
 from models.base_model import BaseModel
-from models.engine import file_storage
 from models.engine.file_storage import FileStorage
+from models import storage
+import os
+import json
 
 
-class TestPep8(unittest.TestCase):
-    """ Validates PEP8 style """
+class TestFileStorage(unittest.TestCase):
+    """tests for file storage"""
 
-    def test_pep8(self):
-        """ Validates PEP8 style conformance """
+    @classmethod
+    def setUpClass(cls):
+        """test for class"""
+        cls.f = inspect.getmembers(FileStorage, inspect.isfunction)
 
-        style = pep8.StyleGuide(quiet=True)
-        f1 = 'models/engine/file_storage.py'
-        f2 = 'tests/test_models/test_engine/test_file_storage.py'
-        res = style.check_files([f1, f2])
-        self.assertEqual(res.total_errors, 0, "Code has style errors.")
-
-
-class TestDocs(unittest.TestCase):
-    """ Validates docstring """
-
-    def test_module_doc(self):
-        """ Validates module doc """
-
-        self.assertTrue(len(file_storage.__doc__) > 0)
-
-    def test_class_doc(self):
-        """ Validates class doc """
-
-        self.assertTrue(len(FileStorage.__doc__) > 0)
-
-    def test_method_docs(self):
-        """ Validates methods doc """
-
-        for func in dir(FileStorage):
-            self.assertTrue(len(func.__doc__) > 0)
-
-
-class BaseModelclassTests(unittest.TestCase):
-    """ Test Case for base_model moudle """
-
-    def setUp(self):
-        """ Setup of test object """
-
-        self.obj = FileStorage()
-
-    def tearDown(self):
-        """ Clear test cases """
-
-        pass
-
-    def test_permissions(self):
-        """ Validates R-W-X permissions """
-
-        read = os.access('models/engine/file_storage.py', os.R_OK)
-        self.assertTrue(read)
-        write = os.access('models/engine/file_storage.py', os.W_OK)
-        self.assertTrue(write)
-        exe = os.access('models/engine/file_storage.py', os.X_OK)
-        self.assertTrue(exe)
-
-    def test_isinstance(self):
-        """ Validates that created object is a FileStorage object """
-
-        self.assertIsInstance(self.obj, FileStorage)
+    def test_save(self):
+        """test for save"""
+        f = FileStorage()
+        if os.path.exists(f._FileStorage__file_path):
+            os.remove(f._FileStorage__file_path)
+        b = BaseModel()
+        b.save()
+        with open('file.json') as jf:
+            tmp = json.load(jf)
+        self.assertTrue(type(tmp) is dict)
 
     def test_all(self):
-        """ Validates all() returns a dictionary """
+        """test for all"""
+        type_to_test = storage.all()
+        self.assertIsNotNone(type_to_test)
+        self.assertIsInstance(storage.all(), dict)
 
-        dic = self.obj.all()
-        self.assertEqual(type(dic), dict)
-        self.assertIs(dic, self.obj._FileStorage__objects)
+    def test_new(self):
+        """test for new"""
+        f = FileStorage()
+        with self.assertRaises(TypeError):
+            f.new()
+
+    def test_reload(self):
+        """test for reload"""
+        BaseModel()
+        obj = storage.all()
+        storage.reload()
+        obj_reloaded = storage.all()
+        self.assertEqual(obj, obj_reloaded)
+
+    def test_reload2(self):
+        """test for reload"""
+        f = FileStorage()
+        b = BaseModel()
+        b.save()
+        f.reload()
+        test_reload = f.all().copy()
+        b.my_num = 32
+        self.assertEqual(b.my_num, 32)
+        f.reload()
+        self.assertNotEqual(f.all(), test_reload)
 
 
 if __name__ == '__main__':

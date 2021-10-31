@@ -7,12 +7,7 @@ Json file to a instance
 import models
 import os.path
 import json
-from models.city import City
-from models.place import Place
-from models.state import State
-from models.review import Review
-from models.amenity import Amenity
-from models.user import User
+
 
 class FileStorage:
     '''Class to Serializes and deserializes'''
@@ -44,23 +39,11 @@ class FileStorage:
 
     def reload(self):
         '''load objs from json file'''
-
-        from models.city import City
-        from models.place import Place
-        from models.state import State
-        from models.review import Review
-        from models.amenity import Amenity
-        from models.user import User
-
-        if os.path.isfile(self.__file_path):
-            from models.base_model import BaseModel
-
-            with open(self.__file_path, "r", encoding='UTF-8') as thefile:
-                objectfromjson = json.load(thefile)
-
-            for key, value in objectfromjson.items():
-                cls = value["__class__"]
-                obj = eval(cls + "(**value)")
-                self.__objects[key] = obj
-        else:
-            return
+        try:
+            with open(self.__file_path, 'r') as jsonTOobjs:
+                all_json = json.load(jsonTOobjs)
+                for key in all_json:
+                    self.__objects[key] = getattr(
+                        models, all_json[key]['__class__'])(**all_json[key])
+        except Exception:
+            pass

@@ -1,111 +1,91 @@
 #!/usr/bin/python3
-"""
-BaseModel class test module
-"""
-import os
-import pep8
+'''Base Model Unittests'''
+
 import unittest
-from datetime import datetime
-from models import base_model
+import datetime
 from models.base_model import BaseModel
+import json
 
 
-class TestPep8(unittest.TestCase):
-    """ Validates PEP8 style """
+class TestBase(unittest.TestCase):
+    '''Tests for BaseModels class'''
 
-    def test_pep8(self):
-        """ Validates PEP8 style conformance """
+    def testBase(self):
+        '''Tests values after creating BaseModel'''
 
-        style = pep8.StyleGuide(quiet=True)
-        f1 = 'models/base_model.py'
-        f2 = 'tests/test_models/test_base_model.py'
-        res = style.check_files([f1, f2])
-        self.assertEqual(res.total_errors, 0, "Code has style errors.")
+        base = BaseModel()
+        self.assertIsInstance(base.id, str)
+        base.id = 2
+        self.assertIsInstance(base, BaseModel)
+        self.assertEqual(2, base.id)
+        self.assertIsInstance(base.updated_at, datetime.datetime)
+        self.assertIsInstance(base.created_at, datetime.datetime)
+        self.assertIsInstance(base.to_dict(), dict)
 
+    def testKwargs(self):
+        '''Tests base created with dict'''
 
-class TestDocs(unittest.TestCase):
-    """ Validates docstring """
+        testDic = {"updated_at": "2021-10-29T23:26:48.287044",
+                   "created_at": "2021-10-29T23:26:48.287044",
+                   "id": "5b9de3e3-1c3e-47ee-8ed0-98bb95eaa2a9",
+                   "__class__": "BaseModel"}
+        base2 = BaseModel(**testDic)
+        self.assertIsInstance(base2, BaseModel)
+        self.assertEqual(base2.id, "5b9de3e3-1c3e-47ee-8ed0-98bb95eaa2a9")
+        self.assertIsInstance(base2.updated_at, datetime.datetime)
+        self.assertIsInstance(base2.created_at, datetime.datetime)
+        self.assertIsInstance(base2.to_dict(), dict)
 
-    def test_module_doc(self):
-        """ Validates module doc """
+    def testBaseSave(self):
+        '''Tests base save'''
 
-        self.assertTrue(len(base_model.__doc__) > 0)
+        base3 = BaseModel()
+        oldUpdate = base3.updated_at
+        base3.save()
+        self.assertNotEqual(base3.created_at, base3.updated_at)
+        self.assertNotEqual(oldUpdate, base3.updated_at)
 
-    def test_class_doc(self):
-        """ Validates class doc """
+    def testToDict(self):
+        '''Tests todict '''
+        c = BaseModel(id=69, created_at="1000-07-29T12:14:07.132263",
+                      updated_at="1020-02-13T07:10:03.134263",
+                      __class__="test123")
+        cDict = c.to_dict()
+        s = ["{'id': 69, 'created_at': ",
+             "'1000-07-29T12:14:07.132263', ",
+             "'updated_at': '1020-02-13T07:10:03.134263',",
+             " '__class__': 'BaseModel'}"]
+        stringline = s[0] + s[1] + s[2] + s[3]
+        self.assertEqual(str(cDict), stringline, "dict not match in toDict()")
+        self.assertIsInstance(cDict["updated_at"], str,
+                              "updated_at not ISO string. used in toDict()")
+        self.assertIsInstance(cDict["created_at"], str,
+                              "created_at not ISO string. used in toDict()")
 
-        self.assertTrue(len(BaseModel.__doc__) > 0)
+    def testSTR(self):
+        '''Tests base __str__'''
+        b = BaseModel()
+        self.assertEqual(str(b), "[BaseModel] ({}) {}".
+                         format(b.id, b.__dict__))
 
-    def test_method_docs(self):
-        """ Validates methods doc """
+    def testSave(self):
+        '''another chance for save?'''
+        c = BaseModel(id=69, created_at="1000-07-29T12:14:07.132263",
+                      updated_at="1020-02-13T07:10:03.134263",
+                      __class__="test123")
+        lastUpdate = str(c.updated_at)
+        c.save()
+        self.assertNotEqual(str(c.updated_at),
+                            lastUpdate,
+                            "updated_at did not change when using save()")
 
-        for func in dir(BaseModel):
-            self.assertTrue(len(func.__doc__) > 0)
-
-
-class BaseModelclassTests(unittest.TestCase):
-    """ Test Case for base_model moudle """
-
-    def setUp(self):
-        """ Create instance global  """
-        self.ins0 = BaseModel()
-        self.ins1 = BaseModel()
-
-    def tearDown(self):
-        """ Clean All test case """
-        pass
-
-    def test_instance(self):
-        """ Test Case to check instance  """
-        self.assertIsInstance(self.ins0, BaseModel)
-        self.assertIsInstance(self.ins1, BaseModel)
-
-    def test_permissions(self):
-        """test read-write-execute permissions"""
-        read = os.access('models/base_model.py', os.R_OK)
-        self.assertTrue(read)
-        write = os.access('models/base_model.py', os.W_OK)
-        self.assertTrue(write)
-        exe = os.access('models/base_model.py', os.X_OK)
-        self.assertTrue(exe)
-
-    def test_id(self):
-        """
-        Test id of instances
-        instance id will be not equal
-        type, will be str
-        """
-        self.assertNotEqual(self.ins0.id, self.ins1.id)
-        self.assertEqual(type(self.ins0.id), str)
-        self.assertEqual(type(self.ins1.id), str)
-
-    def test_datetime(self):
-        """ Test datetime to compare format """
-        cre = self.ins0.created_at
-        self.ins0.save()
-        up = self.ins0.updated_at
-        self.assertEqual(type(cre), datetime)
-        self.assertEqual(type(up), datetime)
-        self.assertNotEqual(cre, up)  # time create and update are diff
-
-    def test_save(self):
-        """ Test save method to validate """
-        newinst = BaseModel()  # New instance
-        first_up = newinst.updated_at  # save fisrt update
-        newinst.save()  # Save instance as dictionary
-        second_up = newinst.updated_at  # save second update
-        self.assertNotEqual(first_up, second_up)  # second_up diff first_up
-
-    def test_to_dict(self):
-        """ The dict return is the same """
-        dateform = '%Y-%m-%dT%H:%M:%S.%f'
-        dic = self.ins0.to_dict()
-        self.assertEqual(type(dic['created_at']), str)
-        self.assertEqual(type(dic['updated_at']), str)
-        self.assertEqual(dic['created_at'],
-                         self.ins0.created_at.strftime(dateform))
-        self.assertEqual(dic['updated_at'],
-                         self.ins0.updated_at.strftime(dateform))
+    def testpassClass(self):
+        '''documentation'''
+        c = BaseModel(id=69, created_at="1000-07-29T12:14:07.132263",
+                      updated_at="1020-02-13T07:10:03.134263",
+                      __class__="test123")
+        self.assertEqual(c.__class__, BaseModel,
+                         "class is assigned as attribute in __init__")
 
 
 if __name__ == '__main__':
