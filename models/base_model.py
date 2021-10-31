@@ -12,16 +12,15 @@ class BaseModel():
     def __init__(self, *args, **kwargs):
         '''init method of BaseModel'''
         if kwargs:
-            for key in kwargs:
+            for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
-                    kwarge[key] = datetime.strptime(kwargs[key], "%Y-%m-%dT%H:%M:%S.%f")
-                if key != ('__class__'):
-                    setattr(self, key,kwargs[key])
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                self.__dict__[key] = value
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-        models.storage.new(self)
+            models.storage.new(self)
 
     def __str__(self):
         '''Method to return a string representation'''
