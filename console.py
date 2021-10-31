@@ -3,7 +3,14 @@
 
 
 import cmd
+from models import storage
+from models.amenity import Amenity
 from models.base_model import BaseModel
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
@@ -18,9 +25,6 @@ class HBNBCommand(cmd.Cmd):
         """EOF command to exit the program\n"""
         exit()
 
-    #def do_help(self, arg):
-     #   """does some bullshit whatever"""
-
     def emptyline(self):
         """handles empty line + enter"""
         pass
@@ -29,19 +33,34 @@ class HBNBCommand(cmd.Cmd):
         """
         Creates a new instance of BaseModel,
         saves it to a JSON file, and prints the id
-        
+
         Usage: $ create BaseModel
         """
         if arg == "" or None:
             print("**class name missing **")
-        elif arg != "BaseModel":
+        elif arg not in ["Amenity", "BaseModel", "City", "Place",
+                         "Review", "State", "User"]:
             print("**class doesn't exist **")
         else:
-            new_model = BaseModel()
-        print(new_model.id)
-        #still need to save as json file, has to do with storage from number 5
+            if arg == "Amenity":
+                new_class = Amenity()
+            elif arg == "BaseModel":
+                new_class = BaseModel()
+            elif arg == "City":
+                new_class = City()
+            elif arg == "Place":
+                new_class = Place()
+            elif arg == "Review":
+                new_class = Review()
+            elif arg == "State":
+                new_class = State()
+            elif arg == "User":
+                new_class = User()
+            print(new_class.id)
+            storage.new(new_class)
+            storage.save()
 
-    def do_show(self, arg): #maybe need another arg for id? not sure
+    def do_show(self, arg):
         """
         Prints the string representation of an instance
         based on the class name and id
@@ -51,43 +70,64 @@ class HBNBCommand(cmd.Cmd):
         class_name = None
         class_id = None
 
-        if arg: #think I need try/except here for if string isn't the correct number of args
-            class_name = arg.split(" ")[0]
-            class_id = arg.split(" ")[1]
-
-        if class_name == "" or None:
+        if arg != "":
+            try:
+                class_name = arg.split(" ")[0]
+                class_id = arg.split(" ")[1]
+            except IndexError:
+                pass
+        if class_name is None:
             print("** class name missing **")
-        elif class_name != "BaseModel":
+        elif class_name not in ["Amenity", "BaseModel", "City",
+                                "Place", "Review", "State", "User"]:
             print("** class doesn't exist **")
-        elif class_id == "" or None:
+        elif class_id is None:
             print("** instance id missing **")
-        elif class_id != self.BaseModel.id: #dont think this is correct, logic placeholder
-            print("** no instance found **")
         else:
-            #call __str__ or just remake here?
-            pass
+            obj_name = class_name + "." + class_id
+            id_check = False
+            all_objs = storage.all()
+            for key in all_objs.keys():
+                if key == obj_name:
+                    obj = all_objs[key]
+                    print(obj)
+                    id_check = True
+            if id_check is not True:
+                print("** no instance found **")
 
     def do_destroy(self, arg):
         """
         Deletes an instance based on the class name and id
-        
+
         Usage: $ destroy BaseModel 1234-1234-1234
         """
         class_name = None
         class_id = None
-        if arg:
-            class_name = arg.split(" ")[0]
-            class_id = arg.split(" ")[1]
-        if class_name == "" or None:
+        if arg != "":
+            try:
+                class_name = arg.split(" ")[0]
+                class_id = arg.split(" ")[1]
+            except IndexError:
+                pass
+        if class_name is None:
             print("** class name missing **")
-        elif class_name != "BaseModel":
+        elif class_name not in ["Amenity", "BaseModel", "City",
+                                "Place", "Review", "State", "User"]:
             print("** class doesn't exist **")
-        elif class_id == "" or None:
+        elif class_id is None:
             print("** instance id missing **")
-        elif class_id != self.BaseModel.id:
-            print("** no instance found **")
-        else: #shit for deleting instance based on class name and id
-            pass
+        else:
+            obj_name = class_name + "." + class_id
+            delete = None
+            all_objs = storage.all()
+            for key in all_objs.keys():
+                if key == obj_name:
+                    delete = key
+            if delete is not None:
+                all_objs.pop(delete)
+                storage.save()
+            else:
+                print("** no instance found **")
 
     def do_all(self, arg):
         """
@@ -97,8 +137,21 @@ class HBNBCommand(cmd.Cmd):
 
         Usage: $ all or $ all BaseModel
         """
-        #saving this for when more of the class is implemented
-        pass
+        obj_list = []
+        if arg == "":
+            all_objs = storage.all()
+            for key in all_objs.values():
+                obj_list.append(key.__str__())
+            print(obj_list)
+        elif arg not in ["Amenity", "BaseModel", "City",
+                         "Place", "Review", "State", "User"]:
+            print("** class doesn't exist **")
+        else:
+            all_objs = storage.all()
+            for key in all_objs.values():
+                if key.__class__.__name__ == arg:
+                    obj_list.append(key.__str__())
+            print(obj_list)
 
     def do_update(self, arg):
         """
@@ -108,8 +161,39 @@ class HBNBCommand(cmd.Cmd):
 
         Usage: $ update BaseModel 1234-1234-1234 email "asdf@mail.com
         """
-        #will fuck with later
-        pass
+        class_name = None
+        class_id = None
+        class_attr_name = None
+        class_attr_val = None
+        if arg != "":
+            try:
+                class_name = arg.split(" ")[0]
+                class_id = arg.split(" ")[1]
+                class_attr_name = arg.split(" ")[2]
+                class_attr_val = arg.split(" ")[3]
+            except IndexError:
+                pass
+        if class_name is None:
+            print("** class name missing **")
+        elif class_id is None:
+            print("** instance id missing **")
+        elif class_attr_name is None:
+            print("** attribute name missing **")
+        elif class_attr_val is None:
+            print("** value missing **")
+        else:
+            obj_name = class_name + "." + class_id
+            id_check = False
+            all_objs = storage.all()
+            all_obj_keys = storage.all().keys()
+            for key in all_obj_keys:
+                if key == obj_name:
+                    obj = all_objs.get(key)
+                    setattr(obj, class_attr_name, class_attr_val)
+                    id_check = True
+            if id_check is not True:
+                print("** no instance found **")
+
 
 if __name__ == '__main__':
         HBNBCommand().cmdloop()
