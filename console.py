@@ -37,10 +37,10 @@ class HBNBCommand(cmd.Cmd):
         Usage: $ create BaseModel
         """
         if arg == "" or None:
-            print("**class name missing **")
+            print("** class name missing **")
         elif arg not in ["Amenity", "BaseModel", "City", "Place",
                          "Review", "State", "User"]:
-            print("**class doesn't exist **")
+            print("** class doesn't exist **")
         else:
             if arg == "Amenity":
                 new_class = Amenity()
