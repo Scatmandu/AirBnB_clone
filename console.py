@@ -175,6 +175,9 @@ class HBNBCommand(cmd.Cmd):
                 pass
         if class_name is None:
             print("** class name missing **")
+        elif class_name not in ["Amenity", "BaseModel", "City",
+                                "Place", "Review", "State", "User"]:
+            print("** class doesn't exist **")
         elif class_id is None:
             print("** instance id missing **")
         elif class_attr_name is None:
