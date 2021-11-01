@@ -9,7 +9,7 @@ class Place(BaseModel):
     '''Defining Review inherited from BaseModel'''
 
     city_id = ""
-    user_is = ""
+    user_id = ""
     name = ""
     description = ""
     number_rooms = 0
