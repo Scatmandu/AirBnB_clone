@@ -157,7 +157,7 @@ class HBNBCommand(cmd.Cmd):
         """
         Updates an instance based on the class name and id by
         adding or updating an attribute
-        (saves the change into a JSON file)
+        and saves the change into a JSON file
 
         Usage: $ update BaseModel 1234-1234-1234 email "asdf@mail.com
         """
