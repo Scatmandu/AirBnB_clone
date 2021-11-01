@@ -26,7 +26,7 @@ class HBNBCommand(cmd.Cmd):
         exit()
 
     def emptyline(self):
-        """handles empty line + enter"""
+        """handles empty line and enter"""
         pass
 
     def do_create(self, arg):
